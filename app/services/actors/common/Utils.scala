@@ -1,6 +1,5 @@
 package services.actors.common
 
-
 object Utils {
 
   final val earthRadiusKm = 6371

@@ -20,7 +20,6 @@ class SectionActor extends ImplicitActor {
         Section(millis, Speed(speed), Distance(distance))
 
       calculationActor ! SectionResult(combinedSection)
-
       self ! PoisonPill
   }
 

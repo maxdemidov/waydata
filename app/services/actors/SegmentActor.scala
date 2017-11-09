@@ -21,7 +21,6 @@ class SegmentActor() extends ImplicitActor {
         Section(millis, speed, distance)
 
       calculationActor ! SectionResult(section)
-
       self ! PoisonPill
   }
 

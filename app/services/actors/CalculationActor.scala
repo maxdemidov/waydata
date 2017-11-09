@@ -14,7 +14,7 @@ class CalculationActor() extends ImplicitActor {
 
   var ref: ActorRef = null
   var isSegmentationDone = false
-  var knocks = 0
+  var knocks: Long = 0
   var inMemorySection: Option[Section] = Option.empty[Section]
 
   override def receive: Receive = {
