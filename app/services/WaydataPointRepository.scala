@@ -2,6 +2,7 @@ package services
 
 import services.model.{Point, Speed, Location}
 
+// TODO - use db and slick
 object WaydataPointRepository {
 
   val example =

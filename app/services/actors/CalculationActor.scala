@@ -1,7 +1,7 @@
 package services.actors
 
 import services.model._
-import akka.actor.{ActorRef, Props}
+import akka.actor.{PoisonPill, ActorRef, Props}
 import services.model.Distance
 import services.model.Point
 import services.model.Speed
@@ -44,6 +44,7 @@ class CalculationActor() extends ImplicitActor {
         case None =>
           if (isSegmentationDone && knocks == 0) {
             ref ! CalculationResults(section.speed, section.distance)
+            ref ! PoisonPill
           }
           Option.apply(section)
         case Some(memorySection: Section) =>
