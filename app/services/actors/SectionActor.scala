@@ -10,9 +10,29 @@ class SectionActor extends ImplicitActor {
 
   override def receive: Receive = {
 
-    case EvaluateSections(x: Section, y: Section, calculationActor: ActorRef) =>
-      // TODO - evaluation new section
-      calculationActor ! SectionResult(Section(Speed(2), Distance(2)))
+    case EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef) =>
+
+      val millis = this.millis(s1, s2)
+      val distance = this.distance(s1, s2)
+      val speed = this.speed(distance, millis)
+
+      val combinedSection =
+        Section(millis, Speed(speed), Distance(distance))
+
+      calculationActor ! SectionResult(combinedSection)
+
       self ! PoisonPill
+  }
+
+  def distance(s1: Section, s2: Section) = {
+    s1.distance.distance + s2.distance.distance
+  }
+
+  def millis(s1: Section, s2: Section) = {
+    s1.millis + s2.millis
+  }
+
+  def speed(distance: Double, millis: Long) = {
+     distance / millis
   }
 }

@@ -6,6 +6,7 @@ import services.model.Distance
 import services.model.Point
 import services.model.Speed
 import services.actors.common.ImplicitActor
+import play.api.Logger
 
 class CalculationActor() extends ImplicitActor {
 
@@ -17,6 +18,9 @@ class CalculationActor() extends ImplicitActor {
   var inMemorySection: Option[Section] = Option.empty[Section]
 
   override def receive: Receive = {
+
+    // TODO work with special cases more precisely
+    // TODO calculate edges as an additional points like they were existed on the FROM and TO places, it's give us a little bit more accuracy
 
     case CalculationUp(points: List[Point]) =>
       ref = sender()
@@ -30,14 +34,18 @@ class CalculationActor() extends ImplicitActor {
       }
 
     case SectionKnock() =>
-      println("knock")
+
+      Logger.info(message = "knocks count = "+(knocks + 1))
+
       knocks = knocks + 1
 
     case SegmentationDone() =>
       isSegmentationDone = true
 
     case SectionResult(section: Section) =>
-      println("section")
+
+      Logger.info(message = "section with distance = " + section.distance.distance)
+
       val calculationActor = self
       knocks = knocks - 1
       inMemorySection = inMemorySection match {

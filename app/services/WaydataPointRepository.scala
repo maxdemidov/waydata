@@ -37,6 +37,11 @@ object WaydataPointRepository {
       1510159909,
       Speed(11.2),
       Location(51.40, 31.08)
+    ),
+    Point(
+      1510169909,
+      Speed(0),
+      Location(51.40, 31.08)
     )
   )
 

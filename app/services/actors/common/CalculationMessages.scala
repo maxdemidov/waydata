@@ -14,7 +14,7 @@ object CalculationMessages {
   case class SegmentationDone() extends CalculationMessage
   case class SectionKnock() extends CalculationMessage
   case class EvaluateSegment(segment: Segment, calculationActor: ActorRef) extends CalculationMessage
-  case class EvaluateSections(x: Section, y: Section, calculationActor: ActorRef) extends CalculationMessage
+  case class EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef) extends CalculationMessage
   case class SectionResult(section: Section) extends CalculationMessage
 
   sealed trait CalculationResponse
