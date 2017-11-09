@@ -39,6 +39,6 @@ class SegmentActor() extends ImplicitActor {
   }
 
   def speed(segment: Segment) = {
-    (segment.toPoint.speed.speed + segment.fromPoint.speed.speed) / 2
+    (segment.toPoint.speed.value + segment.fromPoint.speed.value) / 2
   }
 }

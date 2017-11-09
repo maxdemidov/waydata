@@ -44,7 +44,7 @@ class CalculationActor() extends ImplicitActor {
 
     case SectionResult(section: Section) =>
 
-      Logger.info(message = "section with distance = " + section.distance.distance)
+      Logger.info(message = "section with distance = " + section.distance.value)
 
       val calculationActor = self
       knocks = knocks - 1

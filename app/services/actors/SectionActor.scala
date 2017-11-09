@@ -25,7 +25,7 @@ class SectionActor extends ImplicitActor {
   }
 
   def distance(s1: Section, s2: Section) = {
-    s1.distance.distance + s2.distance.distance
+    s1.distance.value + s2.distance.value
   }
 
   def millis(s1: Section, s2: Section) = {

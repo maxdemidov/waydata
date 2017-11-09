@@ -1,8 +1,8 @@
 package services.model
 
-case class Distance(distance: Double)
+case class Distance(value: Double)
 
-case class Speed(speed: Double)
+case class Speed(value: Double)
 
 case class Location(lat: Double, lon: Double)
 
