@@ -12,4 +12,3 @@
 # built on
 
 https://github.com/playframework/play-scala-starter-example/tree/2.5.x
-https://www.playframework.com/documentation/2.6.x/ScalaJsonHttp

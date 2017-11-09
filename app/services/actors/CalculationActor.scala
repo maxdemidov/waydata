@@ -34,18 +34,14 @@ class CalculationActor() extends ImplicitActor {
       }
 
     case SectionKnock() =>
-
       Logger.info(message = "knocks count = "+(knocks + 1))
-
       knocks = knocks + 1
 
     case SegmentationDone() =>
       isSegmentationDone = true
 
     case SectionResult(section: Section) =>
-
       Logger.info(message = "section with distance = " + section.distance.value)
-
       val calculationActor = self
       knocks = knocks - 1
       inMemorySection = inMemorySection match {
@@ -57,9 +53,9 @@ class CalculationActor() extends ImplicitActor {
           Option.apply(section)
         case Some(memorySection: Section) =>
           calculationActor ! SectionKnock()
-          val coupleEvaluationMessages =
+          val coupleEvaluationMessage =
             EvaluateSections(memorySection, section, calculationActor)
-          actorSystem.actorOf(Props[SectionActor]) ! coupleEvaluationMessages
+          actorSystem.actorOf(Props[SectionActor]) ! coupleEvaluationMessage
           Option.empty[Section]
       }
   }

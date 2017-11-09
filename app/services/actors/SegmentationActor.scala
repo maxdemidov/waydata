@@ -12,24 +12,20 @@ class SegmentationActor() extends ImplicitActor {
 
     case SegmentationPoints(points: List[Point]) =>
       val calculationActor = sender()
-      val segments: List[Segment] =
-        points.foldLeft((List[Segment](), Option.empty[Point]))(
-          (segmentation: (List[Segment], Option[Point]), current: Point) => {
-            segmentation._2 match {
-              case None =>
-                (segmentation._1, Option.apply(current))
-              case Some(previous: Point) =>
-                // TODO - instantiate SegmentActor actor here
-                (Segment(previous, current) :: segmentation._1, Option.apply(current))
-            }
+      points.foldLeft(Option.empty[Point])(
+        (previous: Option[Point], current: Point) => {
+          previous match {
+            case None =>
+              Option.apply(current)
+            case Some(previous: Point) =>
+              calculationActor ! SectionKnock()
+              val pointsEvaluationMessage =
+                EvaluateSegment(Segment(previous, current), calculationActor)
+              actorSystem.actorOf(Props[SegmentActor]) ! pointsEvaluationMessage
+              Option.apply(current)
           }
-        )._1
-      segments.foreach(segment => {
-        calculationActor ! SectionKnock()
-        val pointsEvaluationMessages =
-          EvaluateSegment(segment, calculationActor)
-        actorSystem.actorOf(Props[SegmentActor]) ! pointsEvaluationMessages
-      })
+        }
+      )
       sender ! SegmentationDone()
       self ! PoisonPill
   }
