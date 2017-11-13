@@ -1,8 +1,12 @@
-import com.google.inject.AbstractModule
+import javax.inject.Inject
 
+import com.google.inject.AbstractModule
+import play.api.{Configuration, Environment}
 import services.WaydataService
 
-class Module extends AbstractModule {
+class Module @Inject() (environment: Environment,
+                        configuration: Configuration)
+  extends AbstractModule {
 
   override def configure() = {
 

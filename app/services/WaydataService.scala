@@ -1,56 +1,65 @@
 package services
 
+import java.util.Date
 import javax.inject.{Inject, Singleton}
+
 import services.model._
 import akka.pattern.ask
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
 import services.actors.CalculationActor
-import services.actors.common.CalculationMessages.{CalculationResults, CalculationResponse, CalculationUp}
+import services.actors.common.CalculationMessages.{CalculationResponse, CalculationResults, CalculationUp}
+
 import scala.concurrent.Future
 import akka.util.Timeout
+import repositories.{WayPointRepository}
+
 import scala.concurrent.duration._
 
 @Singleton
-class WaydataService @Inject() (actorSystem: ActorSystem) {
+class WaydataService @Inject() (actorSystem: ActorSystem,
+                                val pointRepository: WayPointRepository)
+    extends WaydataMapping {
 
   implicit val timeout = Timeout(5 seconds)
   implicit val executionContext = actorSystem.dispatcher
 
-  def getAll: List[Point] =
-    WaydataPointRepository.list
-
-  def getExample:Point =
-    WaydataPointRepository.example
-
-  def save(point: Point) =
-    WaydataPointRepository.save(point)
+  def save(point: Point): Future[Unit] =
+    pointRepository.save(mapPointToWayPoint(point))
 
   def report(from: Long, to: Long): Future[Report] = {
-
-    val selectedPoints: List[Point] =
-      this.getAll.filter(
-        point =>
-          point.timestamp >= from && point.timestamp <= to
-      )
-
-    val selectedSortedPoints =
-      selectedPoints.sortWith(_.timestamp < _.timestamp)
-
-    val calculation =
-      actorSystem.actorOf(Props[CalculationActor])
-
-    (calculation ? CalculationUp(selectedSortedPoints)).mapTo[CalculationResponse].map {
-      case calculationResults: CalculationResults =>
-        Report(
-          calculationResults.averageSpeed,
-          calculationResults.totalDistance,
-          selectedSortedPoints
+    val futureReport: Future[Future[Report]] =
+      pointRepository
+        .findByInterval(from, to)
+        .map(
+          mapWayPointsToPointsOption(_) match {
+            case None =>
+              Future(Report(Speed(0), Distance(0), Nil))
+            case Some(intervalPoints: List[Point]) =>
+              val selectedIntervalPoints =
+                intervalPoints.sortWith(_.timestamp < _.timestamp)
+              val calculation =
+                actorSystem.actorOf(Props[CalculationActor])
+              (calculation ? CalculationUp(selectedIntervalPoints))
+                .mapTo[CalculationResponse]
+                .map {
+                  case calculationResults: CalculationResults =>
+                    Report(
+                      calculationResults.averageSpeed,
+                      calculationResults.totalDistance,
+                      selectedIntervalPoints
+                    )
+                  case _ =>
+                    Report(Speed(0), Distance(0), intervalPoints)
+                }
+          }
         )
-      case _ =>
-        // TODO: decide what return
-        Report(
-          Speed(0), Distance(0), Nil
-        )
-    }
+    futureReport.flatMap(identity)
   }
+
+  def getAll: Future[Option[List[Point]]] =
+    pointRepository.findAll().map(mapWayPointsToPointsOption)
+
+  //TODO - fix provlem with time zone between converting long to date
+  def getExample: Future[Option[Point]] =
+    pointRepository.findByDate(1).map(mapWayPointToPointOption)
 }

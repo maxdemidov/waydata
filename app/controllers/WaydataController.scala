@@ -18,15 +18,16 @@ class WaydataController @Inject() (actorSystem: ActorSystem)
     _.validate[A].asEither.left.map(e => BadRequest(JsError.toJson(e)))
   )
 
+  // TODO - fix using exception from future if not success
   def point = Action(validateJson[Point]) { request =>
-      val point = request.body
-      waydataService.save(point)
-      Ok(
-        Json.obj(
-          "status" -> "OK",
-          "message" -> ("Point with timestamp '"+point.timestamp+"' saved.")
-        )
+    val point = request.body
+    waydataService.save(point)
+    Ok(
+      Json.obj(
+        "status" -> "OK",
+        "message" -> ("Point with timestamp '" + point.timestamp + "' saved.")
       )
+    )
   }
 
   def report(from: Long, to: Long) = Action.async {
@@ -35,13 +36,15 @@ class WaydataController @Inject() (actorSystem: ActorSystem)
     )
   }
 
-  def example = Action {
-    val point = waydataService.getExample
-    Ok(Json.toJson(point))
+  def example = Action.async {
+    waydataService.getExample.map(
+      examplePoint => Ok(Json.toJson(examplePoint))
+    )
   }
 
-  def all = Action {
-    val points = waydataService.getAll
-    Ok(Json.toJson(points))
+  def all = Action.async {
+    waydataService.getAll.map(
+      points => Ok(Json.toJson(points))
+    )
   }
 }
