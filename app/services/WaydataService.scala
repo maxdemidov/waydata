@@ -12,6 +12,7 @@ import services.actors.common.CalculationMessages.{CalculationResponse, Calculat
 import scala.concurrent.Future
 import akka.util.Timeout
 import repositories.{WayPointRepository}
+import play.api.Logger
 
 import scala.concurrent.duration._
 
@@ -31,10 +32,10 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
       pointRepository
         .findByInterval(from, to)
         .map(
-          mapWayPointsToPointsOption(_) match {
-            case None =>
+          mapSeqToList(_) match {
+            case Seq() =>
               Future(Report(Speed(0), Distance(0), Nil))
-            case Some(intervalPoints: List[Point]) =>
+            case intervalPoints: Seq[Point] =>
               val selectedIntervalPoints =
                 intervalPoints.sortWith(_.timestamp < _.timestamp)
               val calculation =
@@ -43,6 +44,9 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
                 .mapTo[CalculationResponse]
                 .map {
                   case calculationResults: CalculationResults =>
+                    Logger.info(s"Result: " +
+                      s"averageSpeed = ${calculationResults.averageSpeed}, " +
+                      s"totalDistance = ${calculationResults.totalDistance}")
                     Report(
                       calculationResults.averageSpeed,
                       calculationResults.totalDistance,
@@ -56,8 +60,8 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
     futureReport.flatMap(identity)
   }
 
-  def getAll: Future[Option[List[Point]]] =
-    pointRepository.findAll().map(mapWayPointsToPointsOption)
+  def getAll: Future[Seq[Point]] =
+    pointRepository.findAll().map(mapSeqToList)
 
   //TODO - fix provlem with time zone between converting long to date
   def getExample: Future[Option[Point]] =

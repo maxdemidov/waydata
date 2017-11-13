@@ -11,6 +11,13 @@ CREATE TABLE way_point
 
 INSERT INTO way_point(created_on, speed, latitude, longitude)
 VALUES(
+  to_timestamp(1),
+  34.5,
+  51.123339,
+  31.381227
+);
+INSERT INTO way_point(created_on, speed, latitude, longitude)
+VALUES(
   NOW(),
   70.5,
   51.523339,

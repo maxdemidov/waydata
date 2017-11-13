@@ -10,7 +10,7 @@ class SegmentationActor() extends ImplicitActor {
 
   override def receive: Receive = {
 
-    case SegmentationPoints(points: List[Point]) =>
+    case SegmentationPoints(points: Seq[Point]) =>
       val calculationActor = sender()
       points.foldLeft(Option.empty[Point])(
         (previous: Option[Point], current: Point) => {

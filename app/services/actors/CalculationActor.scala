@@ -22,7 +22,8 @@ class CalculationActor() extends ImplicitActor {
     // TODO work with special cases more precisely
     // TODO calculate edges as an additional points like they were existed on the FROM and TO places, it's give us a little bit more accuracy
 
-    case CalculationUp(points: List[Point]) =>
+    case CalculationUp(points: Seq[Point]) =>
+      Logger.info(message = "CalculationUp points = " + points.size)
       ref = sender()
       points.size match {
         case 0 =>

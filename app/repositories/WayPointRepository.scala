@@ -1,5 +1,6 @@
 package repositories
 
+import java.util.Date
 import javax.inject.{Inject, Singleton}
 import slick.driver.PostgresDriver.api._
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,27 +38,23 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     }
   }
 
-  def findByInterval(fromDate: Long, toDate: Long): Future[Option[List[WayPoint]]] = {
+  def findByInterval(fromDate: Long, toDate: Long): Future[Seq[(Date ,Double, Double, Double)]] = {
     val selectQuery =
       sql"""
            SELECT created_on, speed, latitude, longitude
            FROM public.way_point
            WHERE created_on BETWEEN to_timestamp($fromDate) and to_timestamp($toDate)
-        """.as[List[WayPoint]]
-    for {
-      item <- databaseProvider.db.run(selectQuery.headOption)
-    } yield item
+        """.as[(Date, Double, Double, Double)]
+    databaseProvider.db.run(selectQuery)
   }
 
-  def findAll(): Future[Option[List[WayPoint]]] = {
+  def findAll(): Future[Seq[(Date ,Double, Double, Double)]] = {
     val selectQuery =
       sql"""
            SELECT created_on, speed, latitude, longitude
            FROM public.way_point
-        """.as[List[WayPoint]]
-    for {
-      item <- databaseProvider.db.run(selectQuery.headOption)
-    } yield item
+        """.as[(Date, Double, Double, Double)]
+    databaseProvider.db.run(selectQuery)
   }
 
   def findByDate(date: Long): Future[Option[WayPoint]] = {
