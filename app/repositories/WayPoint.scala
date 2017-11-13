@@ -2,7 +2,7 @@ package repositories
 
 import java.util.Date
 
-// TODO - use TadleQuery instead SQL
+// TODO - use TableQuery instead SQL
 //trait WayPointsTable {
 //  import slick.driver.PostgresDriver.api._
 //

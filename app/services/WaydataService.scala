@@ -32,7 +32,7 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
       pointRepository
         .findByInterval(from, to)
         .map(
-          mapSeqToList(_) match {
+          mapSeqOfFourToSeqOfPoint(_) match {
             case Seq() =>
               Future(Report(Speed(0), Distance(0), Nil))
             case intervalPoints: Seq[Point] =>
@@ -61,9 +61,9 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
   }
 
   def getAll: Future[Seq[Point]] =
-    pointRepository.findAll().map(mapSeqToList)
+    pointRepository.findAll().map(mapSeqOfFourToSeqOfPoint)
 
-  //TODO - fix provlem with time zone between converting long to date
+  //TODO - fix problem with time zone between converting long to date
   def getExample: Future[Option[Point]] =
     pointRepository.findByDate(1).map(mapWayPointToPointOption)
 }

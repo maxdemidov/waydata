@@ -1,7 +1,5 @@
 package repositories
 
-import java.util.Date
-
 import slick.jdbc.GetResult
 
 trait WayPointResult {

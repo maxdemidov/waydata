@@ -28,7 +28,7 @@ trait WaydataSerializations {
   implicit val reportWrites: Writes[Report] = (
       (JsPath \ "averageSpeed").write[Speed] and
       (JsPath \ "totalDistance").write[Distance] and
-      (JsPath \ "forPoints").write[List[Point]]
+      (JsPath \ "forPoints").write[Seq[Point]]
     )(unlift(Report.unapply))
 
   // reads

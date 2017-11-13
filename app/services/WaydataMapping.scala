@@ -7,7 +7,7 @@ import services.model.{Location, Point, Speed}
 
 trait WaydataMapping {
 
-  def mapSeqToList(seq: Seq[(Date ,Double, Double, Double)]): Seq[Point] = {
+  def mapSeqOfFourToSeqOfPoint(seq: Seq[(Date ,Double, Double, Double)]): Seq[Point] = {
     seq.map(v => Point(v._1.getTime, Speed(v._2), Location(v._3, v._4)))
   }
 
