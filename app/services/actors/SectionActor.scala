@@ -1,8 +1,8 @@
 package services.actors
 
-import services.model.{Section, Distance, Speed, Segment}
 import akka.actor.{PoisonPill, ActorRef}
 import services.actors.common.ImplicitActor
+import services.model.{Speed, Section, Distance}
 
 class SectionActor extends ImplicitActor {
 

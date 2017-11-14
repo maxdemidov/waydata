@@ -1,11 +1,7 @@
 package services.actors.common
 
-import services.model._
 import akka.actor.ActorRef
-import services.model.Point
-import services.model.Segment
-import services.model.Section
-import services.model.Speed
+import services.model.{Point, Section, Segment, Speed, Distance}
 
 object CalculationMessages {
   sealed trait CalculationMessage

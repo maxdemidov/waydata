@@ -1,7 +1,7 @@
 package repositories
 
-import java.util.Date
 import javax.inject.{Inject, Singleton}
+
 import slick.driver.PostgresDriver.api._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
@@ -13,7 +13,7 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
 //    with WayPointsTable
   {
 
-// TODO - use TadleQuery instead SQL
+// TODO - use TableQuery instead SQL
 //  def findByDate(date: Long) = {
 //    val query = points.filter(point => point.createdOn)
 //      .map(p => (p.createdOn, p.speed, p.latitude, p.longitude))

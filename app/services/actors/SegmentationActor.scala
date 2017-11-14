@@ -1,9 +1,9 @@
 package services.actors
 
-import services.model.{Point, Segment}
 import akka.actor.{PoisonPill, Props}
 import play.api.Logger
 import services.actors.common.ImplicitActor
+import services.model.{Point, Segment}
 
 class SegmentationActor() extends ImplicitActor {
 

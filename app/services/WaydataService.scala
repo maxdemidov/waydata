@@ -1,20 +1,17 @@
 package services
 
-import java.util.Date
 import javax.inject.{Inject, Singleton}
 
-import services.model._
+import akka.util.Timeout
 import akka.pattern.ask
 import akka.actor.{ActorSystem, Props}
+import play.api.Logger
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import services.model.{Point, Speed, Distance, Report}
 import services.actors.CalculationActor
 import services.actors.common.CalculationMessages.{CalculationResponse, CalculationResults, CalculationUp}
-
-import scala.concurrent.Future
-import akka.util.Timeout
-import repositories.{WayPointRepository}
-import play.api.Logger
-
-import scala.concurrent.duration._
+import repositories.WayPointRepository
 
 @Singleton
 class WaydataService @Inject() (actorSystem: ActorSystem,
@@ -27,6 +24,7 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
   def save(point: Point): Future[Unit] =
     pointRepository.save(mapPointToWayPoint(point))
 
+  // TODO - what happende if timeout for one of section (losing one actor) and as a result for all calculation (knocks > 0)
   def report(from: Long, to: Long): Future[Report] = {
     val futureReport: Future[Future[Report]] =
       pointRepository

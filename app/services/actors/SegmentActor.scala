@@ -1,8 +1,8 @@
 package services.actors
 
-import services.model.{Section, Speed, Distance, Segment}
 import akka.actor.{PoisonPill, ActorRef}
 import services.actors.common.ImplicitActor
+import services.model.{Section, Speed, Distance, Segment}
 
 class SegmentActor() extends ImplicitActor {
 
@@ -14,11 +14,13 @@ class SegmentActor() extends ImplicitActor {
     case EvaluateSegment(segment: Segment, calculationActor: ActorRef) =>
 
       val millis = this.millis(segment)
-      val speed = Speed(this.speed(segment))
-      val distance =  Distance(this.distance(segment))
+      val distance =  this.distance(segment)
+      val speed = this.speed(distance, millis)
+      // TODO - deside which case of calculation speed is better to use, by time or as average between inputed values
+//      val speed = Speed(this.speed(segment))
 
       val section =
-        Section(millis, speed, distance)
+        Section(millis, Speed(speed), Distance(distance))
 
       calculationActor ! SectionResult(section)
       self ! PoisonPill
@@ -37,7 +39,10 @@ class SegmentActor() extends ImplicitActor {
     segment.toPoint.timestamp - segment.fromPoint.timestamp
   }
 
-  def speed(segment: Segment) = {
-    (segment.toPoint.speed.value + segment.fromPoint.speed.value) / 2
+  def speed(distance: Double, millis: Long) = {
+    distance / millis
   }
+//  def speed(segment: Segment) = {
+//    (segment.toPoint.speed.value + segment.fromPoint.speed.value) / 2
+//  }
 }

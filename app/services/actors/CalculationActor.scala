@@ -1,12 +1,9 @@
 package services.actors
 
-import services.model._
 import akka.actor.{PoisonPill, ActorRef, Props}
-import services.model.Distance
-import services.model.Point
-import services.model.Speed
-import services.actors.common.ImplicitActor
 import play.api.Logger
+import services.actors.common.ImplicitActor
+import services.model.{Point, Section, Speed, Distance}
 
 class CalculationActor() extends ImplicitActor {
 
