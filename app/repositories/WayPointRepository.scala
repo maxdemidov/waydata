@@ -37,6 +37,8 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
         Logger.info("Caught exception when adding new point: " + e.getMessage)
     }
   }
+    
+  // TODO - !ERROR! - use millis 
 
   def findByInterval(fromDate: Long, toDate: Long): Future[Seq[(Long ,Double, Double, Double)]] = {
     val selectQuery =
