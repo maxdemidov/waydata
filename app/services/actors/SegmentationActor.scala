@@ -23,7 +23,7 @@ class SegmentationActor() extends ImplicitActor {
             case None =>
               Option.apply(current)
             case Some(previous: Point) =>
-              calculationActor ! SectionKnock()
+              //calculationActor ! SectionKnock()
               val pointsEvaluationMessage =
                 EvaluateSegment(Segment(previous, current), calculationActor)
               actorSystem.actorOf(Props[SegmentActor]) ! pointsEvaluationMessage
