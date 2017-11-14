@@ -12,5 +12,5 @@
 
 https://hub.docker.com/_/postgres/
 
-sudo docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
-sudo docker run -it --rm --link postgres:postgres postgres psql -h postgres -U postgres
+- sudo docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
+- sudo docker run -it --rm --link postgres:postgres postgres psql -h postgres -U postgres
