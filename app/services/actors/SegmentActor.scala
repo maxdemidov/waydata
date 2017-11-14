@@ -1,8 +1,8 @@
 package services.actors
 
-import akka.actor.{PoisonPill, ActorRef}
+import akka.actor.{ActorRef, PoisonPill}
 import services.actors.common.ImplicitActor
-import services.model.{Section, Speed, Distance, Segment}
+import services.model.{Distance, Section, Segment, Speed}
 
 class SegmentActor() extends ImplicitActor {
 
@@ -12,21 +12,21 @@ class SegmentActor() extends ImplicitActor {
   override def receive: Receive = {
 
     case EvaluateSegment(segment: Segment, calculationActor: ActorRef) =>
-
-      val millis = this.millis(segment)
-      val distance =  this.distance(segment)
-      val speed = this.speed(distance, millis)
-      // TODO - deside which case of calculation speed is better to use, by time or as average between inputed values
-//      val speed = Speed(this.speed(segment))
-
+      val seconds = this.seconds(segment)
+      val distance = this.distance(segment)
+      val speed = distance match {
+        case d if d.equals(0) =>
+          this.speed(segment)
+        case _ =>
+          this.speed(distance, seconds)
+      }
       val section =
-        Section(millis, Speed(speed), Distance(distance))
-
+        Section(seconds, Speed(speed), Distance(distance))
       calculationActor ! SectionResult(section)
       self ! PoisonPill
   }
 
-  def distance(segment: Segment) = {
+  def distance(segment: Segment): Double = {
     Utils.kmBetweenEarthCoordinates(
       segment.fromPoint.location.lat,
       segment.fromPoint.location.lon,
@@ -35,14 +35,17 @@ class SegmentActor() extends ImplicitActor {
     )
   }
 
-  def millis(segment: Segment) = {
+  def seconds(segment: Segment): Long = {
     segment.toPoint.timestamp - segment.fromPoint.timestamp
   }
 
-  def speed(distance: Double, millis: Long) = {
-    distance / millis
+  def speed(distance: Double, seconds: Long): Double = {
+    val hours =
+      seconds.toDouble / SECONDS_IN_HOUR.toDouble
+    distance / hours
   }
-//  def speed(segment: Segment) = {
-//    (segment.toPoint.speed.value + segment.fromPoint.speed.value) / 2
-//  }
+
+  def speed(segment: Segment): Double = {
+    (segment.toPoint.speed.value + segment.fromPoint.speed.value) / 2
+  }
 }

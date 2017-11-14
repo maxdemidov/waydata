@@ -12,4 +12,4 @@ case class Report(averageSpeed: Speed, totalDistance: Distance, forPoints: Seq[P
 
 case class Segment(fromPoint: Point, toPoint: Point)
 
-case class Section(millis: Long, speed: Speed, distance: Distance)
+case class Section(seconds: Long, speed: Speed, distance: Distance)

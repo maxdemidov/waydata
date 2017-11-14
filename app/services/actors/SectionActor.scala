@@ -1,8 +1,8 @@
 package services.actors
 
-import akka.actor.{PoisonPill, ActorRef}
+import akka.actor.{ActorRef, PoisonPill}
 import services.actors.common.ImplicitActor
-import services.model.{Speed, Section, Distance}
+import services.model.{Distance, Section, Speed}
 
 class SectionActor extends ImplicitActor {
 
@@ -11,27 +11,35 @@ class SectionActor extends ImplicitActor {
   override def receive: Receive = {
 
     case EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef) =>
-
-      val millis = this.millis(s1, s2)
+      val seconds = this.seconds(s1, s2)
       val distance = this.distance(s1, s2)
-      val speed = this.speed(distance, millis)
-
+      val speed = distance match {
+        case d if d.equals(0) =>
+          this.speed(s1, s2)
+        case _ =>
+          this.speed(distance, seconds)
+      }
       val combinedSection =
-        Section(millis, Speed(speed), Distance(distance))
-
+        Section(seconds, Speed(speed), Distance(distance))
       calculationActor ! SectionResult(combinedSection)
       self ! PoisonPill
   }
 
-  def distance(s1: Section, s2: Section) = {
+  def distance(s1: Section, s2: Section): Double = {
     s1.distance.value + s2.distance.value
   }
 
-  def millis(s1: Section, s2: Section) = {
-    s1.millis + s2.millis
+  def seconds(s1: Section, s2: Section): Long = {
+    s1.seconds + s2.seconds
   }
 
-  def speed(distance: Double, millis: Long) = {
-     distance / millis
+  def speed(distance: Double, seconds: Long): Double = {
+    val hours =
+      seconds.toDouble / SECONDS_IN_HOUR.toDouble
+    distance / hours
+  }
+
+  def speed(s1: Section, s2: Section): Double = {
+    (s1.speed.value + s2.speed.value) / 2
   }
 }
