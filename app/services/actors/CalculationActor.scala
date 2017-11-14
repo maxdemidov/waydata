@@ -9,7 +9,8 @@ class CalculationActor() extends ImplicitActor {
 
   import common.CalculationMessages._
 
-  var ref: ActorRef = null
+  var refCalculationActor: ActorRef = null
+  var refSegmentationActor: ActorRef = null
   var isSegmentationDone = false
   var knocks: Long = 0
   var inMemorySection: Option[Section] = Option.empty[Section]
@@ -22,7 +23,7 @@ class CalculationActor() extends ImplicitActor {
     case CalculationUp(points: Seq[Point]) =>
       Logger.info(message =
         s"CalculationUp, points count = ${points.size}")
-      ref = sender()
+      refCalculationActor = sender()
       points.size match {
         case 0 =>
           sender ! CalculationResults(Speed(0), Distance(0))
@@ -31,7 +32,8 @@ class CalculationActor() extends ImplicitActor {
         case _ =>
           knocks = points.size - 1
           // TODO - !ERROR! - set knocks here as points.size - 1 becouse SectionResult can possible be earlier then SectionKnock
-          actorSystem.actorOf(Props[SegmentationActor]) ! SegmentationPoints(points)
+          refSegmentationActor = actorSystem.actorOf(Props[SegmentationActor])
+          refSegmentationActor ! SegmentationPoints(points)
       }
 /*
     case SectionKnock() =>
@@ -53,8 +55,9 @@ class CalculationActor() extends ImplicitActor {
       inMemorySection = inMemorySection match {
         case None =>
           if (/*isSegmentationDone &&*/ knocks == 0) {
-            ref ! CalculationResults(section.speed, section.distance)
-            ref ! PoisonPill
+            refCalculationActor ! CalculationResults(section.speed, section.distance)
+            refSegmentationActor ! PoisonPill
+            refCalculationActor ! PoisonPill
           }
           Option.apply(section)
         case Some(memorySection: Section) =>
