@@ -6,7 +6,7 @@ trait WayPointResult {
 
   implicit val getPointResult =
     GetResult(r => WayPoint(
-      r.nextDate(),
+      r.nextLong(),
       r.nextDouble(),
       r.nextDouble(),
       r.nextDouble()
@@ -14,7 +14,7 @@ trait WayPointResult {
 
   implicit val getRowResult =
     GetResult(r => (
-      r.nextDate(),
+      r.nextLong(),
       r.nextDouble(),
       r.nextDouble(),
       r.nextDouble()

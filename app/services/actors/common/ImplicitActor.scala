@@ -1,7 +1,11 @@
 package services.actors.common
 
+import java.text.SimpleDateFormat
+import java.util.{Date, SimpleTimeZone}
+
 import akka.actor.Actor
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -11,13 +15,17 @@ trait ImplicitActor extends Actor {
   implicit val timeout = Timeout(5 seconds)
   implicit val executionContext = actorSystem.dispatcher
 
-  val dateFormat =
-    new java.text.SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+  val dateFormat: SimpleDateFormat = {
+    val dateFormat =
+      new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+    dateFormat.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"))
+    dateFormat
+  }
 
   def nowInSimpleFormat(): String = {
-    dateFormat.format(new java.util.Date())
+    dateFormat.format(new Date())
   }
   def dateInSimpleFormat(timestamp: Long): String = {
-    dateFormat.format(new java.util.Date(timestamp))
+    dateFormat.format(new Date(timestamp))
   }
 }

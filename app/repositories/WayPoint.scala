@@ -17,6 +17,9 @@ import java.util.Date
 //  val points = TableQuery[WayPoints]
 //}
 
-case class WayPoint(createdOn: Date, speed: Double, latitude: Double, longitude: Double)
+case class WayPoint(createdOn: Long,
+                    speed: Double,
+                    latitude: Double,
+                    longitude: Double)
 
 

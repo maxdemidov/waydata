@@ -1,19 +1,24 @@
 package services
 
-import java.util.Date
-
 import repositories.WayPoint
 import services.model.{Location, Point, Speed}
 
 trait WaydataMapping {
 
-  def mapSeqOfFourToSeqOfPoint(seq: Seq[(Date ,Double, Double, Double)]): Seq[Point] = {
-    seq.map(v => Point(v._1.getTime, Speed(v._2), Location(v._3, v._4)))
+  def mapSeqOfRowsToSeqOfPoint(seq: Seq[(Long ,Double, Double, Double)]): Seq[Point] = {
+    seq.map(
+      row =>
+        Point(
+          row._1,
+          Speed(row._2),
+          Location(row._3, row._4)
+        )
+    )
   }
 
   def mapWayPointToPoint(wayPoint: WayPoint): Point = {
     Point(
-      wayPoint.createdOn.getTime,
+      wayPoint.createdOn,
       Speed(wayPoint.speed),
       Location(wayPoint.latitude, wayPoint.longitude)
     )
@@ -43,7 +48,7 @@ trait WaydataMapping {
 
   def mapPointToWayPoint(point: Point): WayPoint = {
     WayPoint(
-      new Date(point.timestamp),
+      point.timestamp,
       point.speed.value,
       point.location.lat,
       point.location.lon

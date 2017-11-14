@@ -23,7 +23,8 @@ class CalculationActor() extends ImplicitActor {
     // TODO calculate edges as an additional points like they were existed on the FROM and TO places, it's give us a little bit more accuracy
 
     case CalculationUp(points: Seq[Point]) =>
-      Logger.info(message = "CalculationUp points = " + points.size)
+      Logger.info(message =
+        s"CalculationUp, points count = ${points.size}")
       ref = sender()
       points.size match {
         case 0 =>
@@ -35,15 +36,18 @@ class CalculationActor() extends ImplicitActor {
       }
 
     case SectionKnock() =>
-      Logger.info(message = "knocks count = "+(knocks + 1))
+      Logger.info(message =
+        s"SectionKnock, knocks + 1, count = ${knocks + 1}")
       knocks = knocks + 1
 
     case SegmentationDone() =>
       isSegmentationDone = true
 
     case SectionResult(section: Section) =>
-      Logger.info(message = "section with distance = " + section.distance.value)
       val calculationActor = self
+      Logger.info(message =
+        s"SectionResult, knocks - 1, count = ${knocks - 1}, " +
+          s"section with distance = ${section.distance.value}")
       knocks = knocks - 1
       inMemorySection = inMemorySection match {
         case None =>

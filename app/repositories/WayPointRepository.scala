@@ -24,45 +24,57 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     databaseProvider.db.run(
       sqlu"""
           INSERT INTO public.way_point (created_on, speed, latitude, longitude)
-          VALUES (to_timestamp(${wayPoint.createdOn.getTime}),
+          VALUES (to_timestamp(${wayPoint.createdOn}),
                   ${wayPoint.speed},
                   ${wayPoint.latitude},
                   ${wayPoint.longitude})
       """.transactionally
     ).map {
       res =>
-        Logger.info(s"Added new point with timestamp ${wayPoint.createdOn.getTime}")
+        Logger.info(s"Added new point with timestamp ${wayPoint.createdOn}")
     }.recover {
       case e: java.sql.SQLException =>
         Logger.info("Caught exception when adding new point: " + e.getMessage)
     }
   }
 
-  def findByInterval(fromDate: Long, toDate: Long): Future[Seq[(Date ,Double, Double, Double)]] = {
+  def findByInterval(fromDate: Long, toDate: Long): Future[Seq[(Long ,Double, Double, Double)]] = {
     val selectQuery =
       sql"""
-           SELECT created_on, speed, latitude, longitude
-           FROM public.way_point
-           WHERE created_on BETWEEN to_timestamp($fromDate) and to_timestamp($toDate)
-        """.as[(Date, Double, Double, Double)]
+          SELECT
+            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC'),
+            speed,
+            latitude,
+            longitude
+          FROM public.way_point
+          WHERE created_on BETWEEN to_timestamp($fromDate) AND to_timestamp($toDate)
+        """.as[(Long, Double, Double, Double)]
     databaseProvider.db.run(selectQuery)
   }
 
-  def findAll(): Future[Seq[(Date ,Double, Double, Double)]] = {
+  def findAll(): Future[Seq[(Long ,Double, Double, Double)]] = {
     val selectQuery =
       sql"""
-           SELECT created_on, speed, latitude, longitude
-           FROM public.way_point
-        """.as[(Date, Double, Double, Double)]
+          SELECT
+            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC'),
+            speed,
+            latitude,
+            longitude
+          FROM public.way_point
+        """.as[(Long, Double, Double, Double)]
     databaseProvider.db.run(selectQuery)
   }
 
-  def findByDate(date: Long): Future[Option[WayPoint]] = {
+  def findByTimestamp(date: Long): Future[Option[WayPoint]] = {
     val selectQuery =
       sql"""
-         SELECT created_on, speed, latitude, longitude
-         FROM public.way_point
-         WHERE created_on = to_timestamp($date)
+          SELECT
+            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC'),
+            speed,
+            latitude,
+            longitude
+          FROM public.way_point
+          WHERE created_on = to_timestamp($date)
       """.as[WayPoint]
     for {
       item <- databaseProvider.db.run(selectQuery.headOption)

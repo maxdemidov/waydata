@@ -31,39 +31,35 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
     val futureReport: Future[Future[Report]] =
       pointRepository
         .findByInterval(from, to)
-        .map(
-          mapSeqOfFourToSeqOfPoint(_) match {
-            case Seq() =>
-              Future(Report(Speed(0), Distance(0), Nil))
-            case intervalPoints: Seq[Point] =>
-              val selectedIntervalPoints =
-                intervalPoints.sortWith(_.timestamp < _.timestamp)
-              val calculation =
-                actorSystem.actorOf(Props[CalculationActor])
-              (calculation ? CalculationUp(selectedIntervalPoints))
-                .mapTo[CalculationResponse]
-                .map {
-                  case calculationResults: CalculationResults =>
-                    Logger.info(s"Result: " +
-                      s"averageSpeed = ${calculationResults.averageSpeed}, " +
-                      s"totalDistance = ${calculationResults.totalDistance}")
-                    Report(
-                      calculationResults.averageSpeed,
-                      calculationResults.totalDistance,
-                      selectedIntervalPoints
-                    )
-                  case _ =>
-                    Report(Speed(0), Distance(0), intervalPoints)
-                }
-          }
-        )
+        .map(intervalPointsRows => {
+            val intervalPoints =
+              mapSeqOfRowsToSeqOfPoint(intervalPointsRows)
+            val sortedIntervalPoints =
+              intervalPoints.sortWith(_.timestamp < _.timestamp)
+            val calculation =
+              actorSystem.actorOf(Props[CalculationActor])
+            (calculation ? CalculationUp(sortedIntervalPoints))
+              .mapTo[CalculationResponse]
+              .map {
+                case calculationResults: CalculationResults =>
+                  Logger.info(s"Result: " +
+                    s"averageSpeed = ${calculationResults.averageSpeed}, " +
+                    s"totalDistance = ${calculationResults.totalDistance}")
+                  Report(
+                    calculationResults.averageSpeed,
+                    calculationResults.totalDistance,
+                    sortedIntervalPoints
+                  )
+                case _ =>
+                  Report(Speed(0), Distance(0), sortedIntervalPoints)
+              }
+        })
     futureReport.flatMap(identity)
   }
 
   def getAll: Future[Seq[Point]] =
-    pointRepository.findAll().map(mapSeqOfFourToSeqOfPoint)
+    pointRepository.findAll().map(mapSeqOfRowsToSeqOfPoint)
 
-  //TODO - fix problem with time zone between converting long to date
   def getExample: Future[Option[Point]] =
-    pointRepository.findByDate(1).map(mapWayPointToPointOption)
+    pointRepository.findByTimestamp(1).map(mapWayPointToPointOption)
 }
