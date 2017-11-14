@@ -33,7 +33,7 @@ class CalculationActor() extends ImplicitActor {
           // TODO - !ERROR! - set knocks here as points.size - 1 becouse SectionResult can possible be earlier then SectionKnock
           actorSystem.actorOf(Props[SegmentationActor]) ! SegmentationPoints(points)
       }
-
+/*
     case SectionKnock() =>
       Logger.info(message =
         s"SectionKnock, knocks + 1, count = ${knocks + 1}")
@@ -43,7 +43,7 @@ class CalculationActor() extends ImplicitActor {
       Logger.info(message =
         s"SegmentationDone, knocks, count = $knocks")
       isSegmentationDone = true
-
+*/
     case SectionResult(section: Section) =>
       val calculationActor = self
       Logger.info(message =
@@ -52,7 +52,7 @@ class CalculationActor() extends ImplicitActor {
       knocks = knocks - 1
       inMemorySection = inMemorySection match {
         case None =>
-          if (isSegmentationDone && knocks == 0) {
+          if (/*isSegmentationDone &&*/ knocks == 0) {
             ref ! CalculationResults(section.speed, section.distance)
             ref ! PoisonPill
           }
