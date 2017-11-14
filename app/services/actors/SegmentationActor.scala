@@ -32,6 +32,6 @@ class SegmentationActor() extends ImplicitActor {
         }
       )
       //sender ! SegmentationDone()
-      self ! PoisonPill
+      //self ! PoisonPill
   }
 }
