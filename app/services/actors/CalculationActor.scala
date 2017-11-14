@@ -29,6 +29,8 @@ class CalculationActor() extends ImplicitActor {
         case 1 =>
           sender ! CalculationResults(points.head.speed, Distance(0))
         case _ =>
+          knocks = points.size - 1
+          // TODO - !ERROR! - set knocks here as points.size - 1 becouse SectionResult can possible be earlier then SectionKnock
           actorSystem.actorOf(Props[SegmentationActor]) ! SegmentationPoints(points)
       }
 
