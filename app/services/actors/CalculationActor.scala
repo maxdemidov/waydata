@@ -21,13 +21,13 @@ class CalculationActor() extends ImplicitActor {
 
   import CalculationActor._
   import SegmentationActor._
-  import TriggeredActor._
+  import CountingActor._
   import SectionActor._
 
   var refSender: ActorRef = _
 
   var refCalculationActor: ActorRef = self
-  var refTriggeredActor: ActorRef = _
+  var refCountingActor: ActorRef = _
   var refSegmentationActor: ActorRef = _
 
   var inMemorySection: Option[Section] = Option.empty[Section]
@@ -49,10 +49,10 @@ class CalculationActor() extends ImplicitActor {
         case 1 =>
           sender ! CalculationResults(points.head.speed, Distance(0))
         case _ =>
-          refTriggeredActor =
-            actorSystem.actorOf(Props(new TriggeredActor(refCalculationActor)))
+          refCountingActor =
+            actorSystem.actorOf(Props(new CountingActor(refCalculationActor)))
           refSegmentationActor =
-            actorSystem.actorOf(Props(new SegmentationActor(refTriggeredActor)))
+            actorSystem.actorOf(Props(new SegmentationActor(refCalculationActor, refCountingActor)))
           context become receiveCalculation
           refSegmentationActor ! SegmentationPoints(points)
       }
@@ -69,8 +69,8 @@ class CalculationActor() extends ImplicitActor {
           Option.apply(section)
         case Some(memorySection: Section) =>
           val sectionRef =
-            actorSystem.actorOf(Props(new SectionActor(refTriggeredActor)))
-          (refTriggeredActor ? RegisterEvaluable(sectionRef)).mapTo[RegisteredEvaluable].map {
+            actorSystem.actorOf(Props(new SectionActor(refCountingActor)))
+          (refCountingActor ? RegisterEvaluable(sectionRef)).mapTo[RegisteredEvaluable].map {
             case RegisteredEvaluable() =>
               val coupleEvaluationMessage =
                 EvaluateSections(memorySection, section, refCalculationActor)
@@ -88,8 +88,8 @@ class CalculationActor() extends ImplicitActor {
         case Some(memorySection: Section) =>
           refSender ! CalculationResults(memorySection.speed, memorySection.distance)
       }
+      refCountingActor ! PoisonPill
       refSegmentationActor ! PoisonPill
-      refTriggeredActor ! PoisonPill
       refCalculationActor ! PoisonPill
   }
 }

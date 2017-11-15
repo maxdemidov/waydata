@@ -3,16 +3,15 @@ package services.actors
 import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import play.api.Logger
-import services.actors.CalculationActor.CalculationMessage
 import services.model.{Distance, Section, Speed}
 
 object SectionActor {
   case class EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef)
 }
-class SectionActor(refTriggeredActor: ActorRef) extends EvaluableActor {
+class SectionActor(refCountingActor: ActorRef) extends EvaluableActor {
 
   import CalculationActor._
-  import TriggeredActor._
+  import CountingActor._
   import SectionActor._
 
   override def receive: Receive = {
@@ -32,7 +31,7 @@ class SectionActor(refTriggeredActor: ActorRef) extends EvaluableActor {
         s"EvaluateSections, section with distance = $distance and speed = $speed")
       (calculationActor ? SectionResult(combinedSection)).mapTo[ResultReceived].map {
         case ResultReceived() =>
-          (refTriggeredActor ? UnregisterEvaluable(self)).mapTo[UnregisteredEvaluable].map {
+          (refCountingActor ? UnregisterEvaluable(self)).mapTo[UnregisteredEvaluable].map {
             case UnregisteredEvaluable() =>
               self ! PoisonPill
           }
@@ -45,12 +44,6 @@ class SectionActor(refTriggeredActor: ActorRef) extends EvaluableActor {
 
   def seconds(s1: Section, s2: Section): Long = {
     s1.seconds + s2.seconds
-  }
-
-  def speed(distance: Double, seconds: Long): Double = {
-    val hours =
-      seconds.toDouble / SECONDS_IN_HOUR.toDouble
-    distance / hours
   }
 
   def speed(s1: Section, s2: Section): Double = {

@@ -4,20 +4,20 @@ import akka.actor.{ActorPath, ActorRef, Kill, PoisonPill}
 import play.api.Logger
 import services.actors.common.ImplicitActor
 
-object TriggeredActor {
+object CountingActor {
   case class RegisterEvaluable(segmentRef: ActorRef)
   case class RegisteredEvaluable()
   case class UnregisterEvaluable(segmentRef: ActorRef)
   case class UnregisteredEvaluable()
   case class SegmentationDone()
 }
-class TriggeredActor(refCalculationActor: ActorRef) extends ImplicitActor {
+class CountingActor(refCalculationActor: ActorRef) extends ImplicitActor {
 
   var evaluations: Map[ActorPath, ActorRef] = Map()
   var isSegmentationDone = false
 
   import CalculationActor._
-  import TriggeredActor._
+  import CountingActor._
 
   override def receive: Receive = {
 

@@ -14,8 +14,6 @@ trait ImplicitActor extends Actor {
   implicit val timeout = Timeout(5 seconds)
   implicit val executionContext = actorSystem.dispatcher
 
-  val SECONDS_IN_HOUR: Long = 60 * 60
-
   val dateFormat: SimpleDateFormat = {
     val dateFormat =
       new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
