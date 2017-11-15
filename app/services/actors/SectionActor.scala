@@ -1,12 +1,15 @@
 package services.actors
 
 import akka.actor.{ActorRef, PoisonPill}
-import services.actors.common.ImplicitActor
+import akka.pattern.ask
+import play.api.Logger
 import services.model.{Distance, Section, Speed}
 
-class SectionActor extends ImplicitActor {
+class SectionActor(refTriggeredActor: ActorRef) extends EvaluableActor {
 
   import common.CalculationMessages._
+  import CalculationActor._
+  import TriggeredActor._
 
   override def receive: Receive = {
 
@@ -21,8 +24,15 @@ class SectionActor extends ImplicitActor {
       }
       val combinedSection =
         Section(seconds, Speed(speed), Distance(distance))
-      calculationActor ! SectionResult(combinedSection)
-      self ! PoisonPill
+      Logger.info(message =
+        s"EvaluateSections, section with distance = $distance and speed = $speed")
+      (calculationActor ? SectionResult(combinedSection)).mapTo[ResultReceived].map {
+        case ResultReceived() =>
+          (refTriggeredActor ? UnregisterEvaluable(self)).mapTo[UnregisteredEvaluable].map {
+            case UnregisteredEvaluable() =>
+              self ! PoisonPill
+          }
+      }
   }
 
   def distance(s1: Section, s2: Section): Double = {

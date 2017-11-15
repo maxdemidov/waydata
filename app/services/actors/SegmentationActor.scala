@@ -1,13 +1,19 @@
 package services.actors
 
-import akka.actor.{PoisonPill, Props}
+import akka.actor.{ActorRef, PoisonPill, Props}
+import akka.pattern.ask
 import play.api.Logger
 import services.actors.common.ImplicitActor
 import services.model.{Point, Segment}
 
-class SegmentationActor() extends ImplicitActor {
+object SegmentationActor {
+  case class SegmentationDone()
+}
+class SegmentationActor(refTriggeredActor: ActorRef) extends ImplicitActor {
 
   import common.CalculationMessages._
+  import TriggeredActor._
+  import SegmentationActor._
 
   override def receive: Receive = {
 
@@ -23,15 +29,19 @@ class SegmentationActor() extends ImplicitActor {
             case None =>
               Option.apply(current)
             case Some(previous: Point) =>
-              //calculationActor ! SectionKnock()
-              val pointsEvaluationMessage =
-                EvaluateSegment(Segment(previous, current), calculationActor)
-              actorSystem.actorOf(Props[SegmentActor]) ! pointsEvaluationMessage
+              val segmentRef =
+                actorSystem.actorOf(Props(new SegmentActor(refTriggeredActor)))
+              (refTriggeredActor ? RegisterEvaluable(segmentRef)).mapTo[RegisteredEvaluable].map {
+                case RegisteredEvaluable() =>
+                  val pointsEvaluationMessage =
+                    EvaluateSegment(Segment(previous, current), calculationActor)
+                  segmentRef ! pointsEvaluationMessage
+              }
               Option.apply(current)
           }
         }
       )
-      //sender ! SegmentationDone()
-      //self ! PoisonPill
+      refTriggeredActor ! SegmentationDone()
+//      self ! PoisonPill
   }
 }

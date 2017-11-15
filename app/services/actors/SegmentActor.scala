@@ -1,11 +1,14 @@
 package services.actors
 
 import akka.actor.{ActorRef, PoisonPill}
-import services.actors.common.ImplicitActor
+import akka.pattern.ask
+import play.api.Logger
 import services.model.{Distance, Section, Segment, Speed}
 
-class SegmentActor() extends ImplicitActor {
+class SegmentActor(refTriggeredActor: ActorRef) extends EvaluableActor {
 
+  import CalculationActor._
+  import TriggeredActor._
   import common.CalculationMessages._
   import common.Utils
 
@@ -22,8 +25,15 @@ class SegmentActor() extends ImplicitActor {
       }
       val section =
         Section(seconds, Speed(speed), Distance(distance))
-      calculationActor ! SectionResult(section)
-      self ! PoisonPill
+      Logger.info(message =
+        s"EvaluateSegment, section with distance = $distance and speed = $speed")
+      (calculationActor ? SectionResult(section)).mapTo[ResultReceived].map {
+        case ResultReceived() =>
+          (refTriggeredActor ? UnregisterEvaluable(self)).mapTo[UnregisteredEvaluable].map {
+            case UnregisteredEvaluable() =>
+              self ! PoisonPill
+          }
+      }
   }
 
   def distance(segment: Segment): Double = {

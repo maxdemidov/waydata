@@ -1,7 +1,7 @@
-package services
+package controllers
 
-import play.api.libs.json.{Reads, JsPath, Writes}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 import services.model._
 
 trait WaydataSerializations {
