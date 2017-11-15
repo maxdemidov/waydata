@@ -11,7 +11,7 @@ object SegmentationActor {
 }
 class SegmentationActor(refTriggeredActor: ActorRef) extends ImplicitActor {
 
-  import common.CalculationMessages._
+  import CalculationActor._
   import TriggeredActor._
   import SegmentationActor._
 
@@ -42,6 +42,5 @@ class SegmentationActor(refTriggeredActor: ActorRef) extends ImplicitActor {
         }
       )
       refTriggeredActor ! SegmentationDone()
-//      self ! PoisonPill
   }
 }

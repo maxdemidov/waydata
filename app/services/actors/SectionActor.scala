@@ -7,7 +7,6 @@ import services.model.{Distance, Section, Speed}
 
 class SectionActor(refTriggeredActor: ActorRef) extends EvaluableActor {
 
-  import common.CalculationMessages._
   import CalculationActor._
   import TriggeredActor._
 

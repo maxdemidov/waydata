@@ -9,7 +9,6 @@ class SegmentActor(refTriggeredActor: ActorRef) extends EvaluableActor {
 
   import CalculationActor._
   import TriggeredActor._
-  import common.CalculationMessages._
   import common.Utils
 
   override def receive: Receive = {

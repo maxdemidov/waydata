@@ -8,10 +8,11 @@ import akka.actor.{ActorSystem, Props}
 import play.api.Logger
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import services.model.{Point, Speed, Distance, Report}
+import services.model.{Distance, Point, Report, Speed}
 import services.actors.CalculationActor
-import services.actors.common.CalculationMessages.{CalculationResponse, CalculationResults, CalculationUp}
+import services.actors.CalculationActor.{CalculationResponse, CalculationResults, CalculationUp}
 import repositories.WayPointRepository
+import services.actors.CalculationActor.CalculationError
 
 @Singleton
 class WaydataService @Inject() (actorSystem: ActorSystem,
@@ -39,16 +40,12 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
             (calculation ? CalculationUp(sortedIntervalPoints))
               .mapTo[CalculationResponse]
               .map {
-                case calculationResults: CalculationResults =>
-                  Logger.info(s"Result: " +
-                    s"averageSpeed = ${calculationResults.averageSpeed}, " +
-                    s"totalDistance = ${calculationResults.totalDistance}")
-                  Report(
-                    calculationResults.averageSpeed,
-                    calculationResults.totalDistance,
-                    sortedIntervalPoints
-                  )
-                case _ =>
+                case CalculationResults(averageSpeed, totalDistance) =>
+                  Logger.info(s"CalculationResults: " +
+                    s"averageSpeed = $averageSpeed, totalDistance = $totalDistance")
+                  Report(averageSpeed, totalDistance, sortedIntervalPoints)
+                case CalculationError(message) =>
+                  Logger.info(s"CalculationError: $message")
                   Report(Speed(0), Distance(0), sortedIntervalPoints)
               }
         })

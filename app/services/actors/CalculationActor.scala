@@ -4,15 +4,24 @@ import akka.actor.{ActorRef, PoisonPill, Props}
 import akka.pattern.ask
 import play.api.Logger
 import services.actors.common.ImplicitActor
-import services.model.{Distance, Point, Section, Speed}
+import services.model._
 
 object CalculationActor {
-  case class CalculationDone()
-  case class ResultReceived()
+  sealed trait CalculationMessage
+  case class CalculationUp(points: Seq[Point]) extends CalculationMessage
+  case class SegmentationPoints(points: Seq[Point]) extends CalculationMessage
+  case class EvaluateSegment(segment: Segment, calculationActor: ActorRef) extends CalculationMessage
+  case class EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef) extends CalculationMessage
+  case class SectionResult(section: Section) extends CalculationMessage
+  case class CalculationDone() extends CalculationMessage
+  case class ResultReceived() extends CalculationMessage
+
+  sealed trait CalculationResponse
+  case class CalculationResults(averageSpeed: Speed, totalDistance: Distance) extends CalculationResponse
+  case class CalculationError(message: String) extends CalculationResponse
 }
 class CalculationActor() extends ImplicitActor {
 
-  import common.CalculationMessages._
   import CalculationActor._
   import TriggeredActor._
 
@@ -55,8 +64,7 @@ class CalculationActor() extends ImplicitActor {
     case SectionResult(section: Section) =>
       Logger.info(message =
         s"SectionResult, " +
-          s"section with distance = ${section.distance.value} " +
-          s"and speed = ${section.speed.value}")
+          s"section with distance = ${section.distance.value} and speed = ${section.speed.value}")
       inMemorySection = inMemorySection match {
         case None =>
           Option.apply(section)
@@ -77,7 +85,7 @@ class CalculationActor() extends ImplicitActor {
       Logger.info(message = s"CalculationDone")
       inMemorySection match {
         case None =>
-          // TODO exception
+          refSender ! CalculationError("")
         case Some(memorySection: Section) =>
           refSender ! CalculationResults(memorySection.speed, memorySection.distance)
       }
