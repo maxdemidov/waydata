@@ -47,6 +47,9 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
                 case CalculationError(message) =>
                   Logger.info(s"CalculationError: $message")
                   Report(Speed(0), Distance(0), sortedIntervalPoints)
+                case _ => 
+                  Logger.info(s"Undefined message")
+                  Report(Speed(0), Distance(0), sortedIntervalPoints)
               }
         })
     futureReport.flatMap(identity)
