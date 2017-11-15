@@ -85,7 +85,7 @@ class CalculationActor() extends ImplicitActor {
       Logger.info(message = s"CalculationDone")
       inMemorySection match {
         case None =>
-          refSender ! CalculationError("")
+          refSender ! CalculationError("Result lost!")
         case Some(memorySection: Section) =>
           refSender ! CalculationResults(memorySection.speed, memorySection.distance)
       }
