@@ -9,6 +9,7 @@ object TriggeredActor {
   case class RegisteredEvaluable()
   case class UnregisterEvaluable(segmentRef: ActorRef)
   case class UnregisteredEvaluable()
+  case class SegmentationDone()
 }
 class TriggeredActor(refCalculationActor: ActorRef) extends ImplicitActor {
 
@@ -16,7 +17,6 @@ class TriggeredActor(refCalculationActor: ActorRef) extends ImplicitActor {
   var isSegmentationDone = false
 
   import CalculationActor._
-  import SegmentationActor._
   import TriggeredActor._
 
   override def receive: Receive = {

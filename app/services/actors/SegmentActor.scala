@@ -3,12 +3,17 @@ package services.actors
 import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import play.api.Logger
+import services.actors.CalculationActor.CalculationMessage
 import services.model.{Distance, Section, Segment, Speed}
 
+object SegmentActor {
+  case class EvaluateSegment(segment: Segment, calculationActor: ActorRef)
+}
 class SegmentActor(refTriggeredActor: ActorRef) extends EvaluableActor {
 
   import CalculationActor._
   import TriggeredActor._
+  import SegmentActor._
   import common.Utils
 
   override def receive: Receive = {

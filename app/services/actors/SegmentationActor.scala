@@ -3,16 +3,17 @@ package services.actors
 import akka.actor.{ActorRef, PoisonPill, Props}
 import akka.pattern.ask
 import play.api.Logger
+import services.actors.CalculationActor.CalculationMessage
 import services.actors.common.ImplicitActor
 import services.model.{Point, Segment}
 
 object SegmentationActor {
-  case class SegmentationDone()
+  case class SegmentationPoints(points: Seq[Point])
 }
 class SegmentationActor(refTriggeredActor: ActorRef) extends ImplicitActor {
 
-  import CalculationActor._
   import TriggeredActor._
+  import SegmentActor._
   import SegmentationActor._
 
   override def receive: Receive = {
