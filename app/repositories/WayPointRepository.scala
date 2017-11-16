@@ -24,7 +24,7 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     databaseProvider.db.run(
       sqlu"""
           INSERT INTO public.way_point (created_on, speed, latitude, longitude)
-          VALUES (to_timestamp(${wayPoint.createdOn}),
+          VALUES (to_timestamp(${wayPoint.createdOn}::double precision / 1000),
                   ${wayPoint.speed},
                   ${wayPoint.latitude},
                   ${wayPoint.longitude})
@@ -42,12 +42,14 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     val selectQuery =
       sql"""
           SELECT
-            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC'),
+            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC') * 1000,
             speed,
             latitude,
             longitude
           FROM public.way_point
-          WHERE created_on BETWEEN to_timestamp($fromDate) AND to_timestamp($toDate)
+          WHERE created_on
+            BETWEEN to_timestamp($fromDate::double precision / 1000)
+                AND to_timestamp($toDate::double precision / 1000)
         """.as[(Long, Double, Double, Double)]
     databaseProvider.db.run(selectQuery)
   }
@@ -56,7 +58,7 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     val selectQuery =
       sql"""
           SELECT
-            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC'),
+            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC') * 1000,
             speed,
             latitude,
             longitude
@@ -65,16 +67,16 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     databaseProvider.db.run(selectQuery)
   }
 
-  def findByTimestamp(date: Long): Future[Option[WayPoint]] = {
+  def findByTimestamp(timestamp: Long): Future[Option[WayPoint]] = {
     val selectQuery =
       sql"""
           SELECT
-            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC'),
+            EXTRACT(EPOCH FROM created_on AT TIME ZONE 'UTC') * 1000,
             speed,
             latitude,
             longitude
           FROM public.way_point
-          WHERE created_on = to_timestamp($date)
+          WHERE created_on = to_timestamp($timestamp::double precision / 1000)
       """.as[WayPoint]
     for {
       item <- databaseProvider.db.run(selectQuery.headOption)

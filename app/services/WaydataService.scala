@@ -58,5 +58,5 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
     pointRepository.findAll().map(mapSeqOfRowsToSeqOfPoint)
 
   def getExample: Future[Option[Point]] =
-    pointRepository.findByTimestamp(1).map(mapWayPointToPointOption)
+    pointRepository.findByTimestamp(1000).map(mapWayPointToPointOption)
 }
