@@ -8,7 +8,7 @@
 
 для подсчета статистики используйте актеры
 
-# scala sbt play akka slick example 
+# scala/sbt/play/akka/slick example 
 
 https://github.com/git-josip/reactive-play-scala-akka-slick-guice-domain_validation-seed
 
