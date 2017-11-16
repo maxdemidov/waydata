@@ -14,3 +14,8 @@ https://hub.docker.com/_/postgres/
 
 - sudo docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
 - sudo docker run -it --rm --link postgres:postgres postgres psql -h postgres -U postgres
+
+# scala sbt play akka slick example 
+
+https://github.com/git-josip/reactive-play-scala-akka-slick-guice-domain_validation-seed
+

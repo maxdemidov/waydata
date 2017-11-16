@@ -25,7 +25,6 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
   def save(point: Point): Future[Unit] =
     pointRepository.save(mapPointToWayPoint(point))
 
-  // TODO - what happende if timeout for one of section (losing one actor) and as a result for all calculation (knocks > 0)
   def report(from: Long, to: Long): Future[Report] = {
     val futureReport: Future[Future[Report]] =
       pointRepository

@@ -36,7 +36,8 @@ class CalculationActor() extends ImplicitActor {
 
   def receiveSegmentation: Receive = {
 
-    // TODO calculate edges as an additional points like they were existed on the FROM and TO places, it's give us a little bit more accuracy
+    // TODO - what will happened with the result if caused timeout for one of section or one actor would be losing
+    // TODO - calculate edges as an additional points like they were existed on the FROM and TO places, it's give us a little bit more accuracy
 
     case CalculationUp(points: Seq[Point]) =>
       Logger.info(message =
