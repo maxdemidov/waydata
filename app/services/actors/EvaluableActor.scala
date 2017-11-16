@@ -2,13 +2,16 @@ package services.actors
 
 import services.actors.common.ImplicitActor
 
+object EvaluableActor {
+  case class ResultReceived()
+}
 abstract class EvaluableActor extends ImplicitActor {
 
-  val SECONDS_IN_HOUR: Long = 60 * 60
+  val MILLIS_IN_HOUR: Long = 60 * 60 * 1000
 
-  def speed(distance: Double, seconds: Long): Double = {
+  def speed(distance: Double, millis: Long): Double = {
     val hours =
-      seconds.toDouble / SECONDS_IN_HOUR.toDouble
+      millis.toDouble / MILLIS_IN_HOUR.toDouble
     distance / hours
   }
 }

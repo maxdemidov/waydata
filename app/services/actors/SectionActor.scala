@@ -13,23 +13,24 @@ class SectionActor(refCountingActor: ActorRef) extends EvaluableActor {
   import CalculationActor._
   import CountingActor._
   import SectionActor._
+  import EvaluableActor._
 
   override def receive: Receive = {
 
     case EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef) =>
-      val seconds = this.seconds(s1, s2)
+      val millis = this.millis(s1, s2)
       val distance = this.distance(s1, s2)
       val speed = distance match {
         case d if d.equals(0) =>
           this.speed(s1, s2)
         case _ =>
-          this.speed(distance, seconds)
+          this.speed(distance, millis)
       }
       val combinedSection =
-        Section(seconds, Speed(speed), Distance(distance))
+        Section(millis, Speed(speed), Distance(distance))
       Logger.info(message =
         s"EvaluateSections, section with distance = $distance and speed = $speed")
-      (calculationActor ? SectionResult(combinedSection)).mapTo[ResultReceived].map {
+      (calculationActor ? CalculatedSection(combinedSection)).mapTo[ResultReceived].map {
         case ResultReceived() =>
           (refCountingActor ? UnregisterEvaluable(self)).mapTo[UnregisteredEvaluable].map {
             case UnregisteredEvaluable() =>
@@ -42,8 +43,8 @@ class SectionActor(refCountingActor: ActorRef) extends EvaluableActor {
     s1.distance.value + s2.distance.value
   }
 
-  def seconds(s1: Section, s2: Section): Long = {
-    s1.seconds + s2.seconds
+  def millis(s1: Section, s2: Section): Long = {
+    s1.millis + s2.millis
   }
 
   def speed(s1: Section, s2: Section): Double = {

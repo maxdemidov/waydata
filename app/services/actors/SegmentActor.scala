@@ -13,24 +13,24 @@ class SegmentActor(refCountingActor: ActorRef) extends EvaluableActor {
   import CalculationActor._
   import CountingActor._
   import SegmentActor._
-  import common.Utils
+  import EvaluableActor._
 
   override def receive: Receive = {
 
     case EvaluateSegment(segment: Segment, calculationActor: ActorRef) =>
-      val seconds = this.seconds(segment)
+      val millis = this.millis(segment)
       val distance = this.distance(segment)
       val speed = distance match {
         case d if d.equals(0) =>
           this.speed(segment)
         case _ =>
-          this.speed(distance, seconds)
+          this.speed(distance, millis)
       }
       val section =
-        Section(seconds, Speed(speed), Distance(distance))
+        Section(millis, Speed(speed), Distance(distance))
       Logger.info(message =
         s"EvaluateSegment, section with distance = $distance and speed = $speed")
-      (calculationActor ? SectionResult(section)).mapTo[ResultReceived].map {
+      (calculationActor ? CalculatedSection(section)).mapTo[ResultReceived].map {
         case ResultReceived() =>
           (refCountingActor ? UnregisterEvaluable(self)).mapTo[UnregisteredEvaluable].map {
             case UnregisteredEvaluable() =>
@@ -40,6 +40,7 @@ class SegmentActor(refCountingActor: ActorRef) extends EvaluableActor {
   }
 
   def distance(segment: Segment): Double = {
+    import common.Utils
     Utils.kmBetweenEarthCoordinates(
       segment.fromPoint.location.lat,
       segment.fromPoint.location.lon,
@@ -48,7 +49,7 @@ class SegmentActor(refCountingActor: ActorRef) extends EvaluableActor {
     )
   }
 
-  def seconds(segment: Segment): Long = {
+  def millis(segment: Segment): Long = {
     segment.toPoint.timestamp - segment.fromPoint.timestamp
   }
 

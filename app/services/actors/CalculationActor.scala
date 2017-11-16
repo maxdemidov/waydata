@@ -9,9 +9,8 @@ import services.model._
 object CalculationActor {
   sealed trait CalculationMessage
   case class CalculationUp(points: Seq[Point]) extends CalculationMessage
-  case class SectionResult(section: Section) extends CalculationMessage
   case class CalculationDone() extends CalculationMessage
-  case class ResultReceived() extends CalculationMessage
+  case class CalculatedSection(section: Section) extends CalculationMessage
 
   sealed trait CalculationResponse
   case class CalculationResults(averageSpeed: Speed, totalDistance: Distance) extends CalculationResponse
@@ -23,6 +22,7 @@ class CalculationActor() extends ImplicitActor {
   import SegmentationActor._
   import CountingActor._
   import SectionActor._
+  import EvaluableActor._
 
   var refSender: ActorRef = _
 
@@ -36,7 +36,6 @@ class CalculationActor() extends ImplicitActor {
 
   def receiveSegmentation: Receive = {
 
-    // TODO work with special cases more precisely
     // TODO calculate edges as an additional points like they were existed on the FROM and TO places, it's give us a little bit more accuracy
 
     case CalculationUp(points: Seq[Point]) =>
@@ -60,7 +59,7 @@ class CalculationActor() extends ImplicitActor {
 
   def receiveCalculation: Receive = {
 
-    case SectionResult(section: Section) =>
+    case CalculatedSection(section: Section) =>
       Logger.info(message =
         s"SectionResult, " +
           s"section with distance = ${section.distance.value} and speed = ${section.speed.value}")
