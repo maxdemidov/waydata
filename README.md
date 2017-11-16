@@ -18,6 +18,7 @@ https://hub.docker.com/_/postgres/
 
 with exposing port
 - sudo docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
+
 and connecting to psql console
 - sudo docker run -it --rm --link postgres:postgres postgres psql -h postgres -U postgres
 
