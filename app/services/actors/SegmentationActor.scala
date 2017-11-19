@@ -19,25 +19,19 @@ class SegmentationActor(refCalculationActor: ActorRef,
   override def receive: Receive = {
 
     case SegmentationPoints(points: Seq[Point]) =>
-      points.foldLeft(Option.empty[Point])(
-        (previous: Option[Point], current: Point) => {
+      (points zip points.tail).map(
+        neighbouringPoints => {
           Logger.info(message =
-            s"SegmentationPoints, " +
-              s"segmentation point with timestamp = ${current.timestamp} " +
-              s"and date = ${dateInSimpleFormat(current.timestamp)}")
-          previous match {
-            case None =>
-              Option.apply(current)
-            case Some(previous: Point) =>
-              val segmentRef =
-                actorSystem.actorOf(Props(new SegmentActor(refCountingActor)))
-              (refCountingActor ? RegisterEvaluable(segmentRef)).mapTo[RegisteredEvaluable].map {
-                case RegisteredEvaluable() =>
-                  val pointsEvaluationMessage =
-                    EvaluateSegment(Segment(previous, current), refCalculationActor)
-                  segmentRef ! pointsEvaluationMessage
-              }
-              Option.apply(current)
+            s"SegmentationPoints, segmentation " +
+              s"form point with date = ${dateInSimpleFormat(neighbouringPoints._1.timestamp)} " +
+              s"to point with date = ${dateInSimpleFormat(neighbouringPoints._2.timestamp)}")
+          val segmentRef =
+            actorSystem.actorOf(Props(new SegmentActor(refCountingActor)))
+          (refCountingActor ? RegisterEvaluable(segmentRef)).mapTo[RegisteredEvaluable].map {
+            case RegisteredEvaluable() =>
+              val pointsEvaluationMessage =
+                EvaluateSegment(Segment(neighbouringPoints._1, neighbouringPoints._2), refCalculationActor)
+              segmentRef ! pointsEvaluationMessage
           }
         }
       )

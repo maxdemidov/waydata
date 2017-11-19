@@ -30,11 +30,11 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
                   ${wayPoint.longitude})
       """.transactionally
     ).map {
-      res =>
+      response =>
         Logger.info(s"Added new point with timestamp ${wayPoint.createdOn}")
     }.recover {
-      case e: java.sql.SQLException =>
-        Logger.info("Caught exception when adding new point: " + e.getMessage)
+      case exception: java.sql.SQLException =>
+        Logger.info("Caught exception when adding new point: " + exception.getMessage)
     }
   }
 
