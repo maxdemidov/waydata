@@ -1,10 +1,10 @@
-package services.actors.common
+package services.utils
 
-object Utils {
+object EarthPointsDistanceUtils {
 
-  final val earthRadiusKm = 6371
+  private val earthRadiusKm = 6371
 
-  def degreesToRadians(degrees: Double): Double = {
+  private def degreesToRadians(degrees: Double): Double = {
     degrees * Math.PI / 180
   }
 

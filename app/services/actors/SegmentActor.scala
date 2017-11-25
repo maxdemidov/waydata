@@ -3,7 +3,7 @@ package services.actors
 import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import play.api.Logger
-import services.model.{Distance, Section, Segment, Speed}
+import model.{Distance, Section, Segment, Speed}
 
 object SegmentActor {
   case class EvaluateSegment(segment: Segment, calculationActor: ActorRef)
@@ -40,8 +40,8 @@ class SegmentActor(refCountingActor: ActorRef) extends EvaluableActor {
   }
 
   def distance(segment: Segment): Double = {
-    import common.Utils
-    Utils.kmBetweenEarthCoordinates(
+    import services.utils.EarthPointsDistanceUtils
+    EarthPointsDistanceUtils.kmBetweenEarthCoordinates(
       segment.fromPoint.location.lat,
       segment.fromPoint.location.lon,
       segment.toPoint.location.lat,

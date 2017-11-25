@@ -3,7 +3,7 @@ package services.actors
 import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import play.api.Logger
-import services.model.{Distance, Section, Speed}
+import model.{Distance, Section, Speed}
 
 object SectionActor {
   case class EvaluateSections(s1: Section, s2: Section, calculationActor: ActorRef)

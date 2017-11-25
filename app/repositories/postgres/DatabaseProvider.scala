@@ -1,4 +1,4 @@
-package repositories
+package repositories.postgres
 
 import javax.inject.{Inject, Singleton}
 

@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, PoisonPill, Props}
 import akka.pattern.ask
 import play.api.Logger
 import services.actors.common.ImplicitActor
-import services.model._
+import model._
 
 object CalculationActor {
   sealed trait CalculationMessage

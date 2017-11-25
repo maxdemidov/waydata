@@ -1,11 +1,59 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
+## Routes
 
-POST    /waydata/point              controllers.WaydataController.point
 
-GET     /waydata/report/:from/:to   controllers.WaydataController.report(from: Long, to: Long)
+GET     /waydata/user               controllers.WaydataUserController.getAllUsers()
 
-GET     /waydata/example            controllers.WaydataController.example
+# get all users with count of ways for each and count of total points per user and total count of users
 
-GET     /waydata/all                controllers.WaydataController.all
+GET     /waydata/user/:uuid         controllers.WaydataUserController.getUserByUuid(uuid: java.util.UUID)
 
+GET     /waydata/user/:uuid/ways    controllers.WaydataUserController.getAllWaysByUserUuid(uuid: java.util.UUID)
+
+# get all users ways with count of points for each way and total count of point for entire user and count of ways for user
+
+POST    /waydata/user               controllers.WaydataUserController.addUser()
+
+PUT     /waydata/user               controllers.WaydataUserController.editUser()
+
+DELETE  /waydata/user/:uuid         controllers.WaydataUserController.removeUser(uuid: java.util.UUID)
+
+GET     /waydata/user/example/      controllers.WaydataUserController.getUserExample()
+
+
+
+GET     /waydata/way                controllers.WaydataWayController.getAllWays()
+
+# get all ways with count of points for each, and count of total points and count of all ways
+
+GET     /waydata/way/:uuid          controllers.WaydataWayController.getWayByUuid(uuid: java.util.UUID)
+
+GET     /waydata/way/:uuid/points   controllers.WaydataWayController.getAllPointsByWayUuid(uuid: java.util.UUID)
+
+# get all ways point with count of them
+
+POST    /waydata/way                controllers.WaydataWayController.addWay()
+
+PUT     /waydata/way                controllers.WaydataWayController.editWay()
+
+DELETE  /waydata/way/:uuid          controllers.WaydataWayController.removeWay(uuid: java.util.UUID)
+
+GET     /waydata/way/example/       controllers.WaydataWayController.getWayExample()
+
+
+
+GET     /waydata/point              controllers.WaydataController.allPoints()
+
+# ge total count of points at all
+
+POST    /waydata/point              controllers.WaydataController.addPoint()
+# TODO - make UserWayPoint
+
+GET     /waydata/point/example/     controllers.WaydataController.getUserWayPointExample()
+
+
+
+GET     /waydata/report/:from/:to   controllers.WaydataReportController.report(from: Long, to: Long)
+
+
+
+# configs for user with configuration controller

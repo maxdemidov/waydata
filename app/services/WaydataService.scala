@@ -2,28 +2,35 @@ package services
 
 import javax.inject.{Inject, Singleton}
 
-import akka.util.Timeout
 import akka.pattern.ask
 import akka.actor.{ActorSystem, Props}
+import akka.util.Timeout
 import play.api.Logger
+
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import services.model.{Distance, Point, Report, Speed}
 import services.actors.CalculationActor
 import services.actors.CalculationActor.{CalculationResponse, CalculationResults, CalculationUp}
-import repositories.WayPointRepository
+import repositories.cassandra.UserWayPointsRepository
+import repositories.postgres.WayPointRepository
 import services.actors.CalculationActor.CalculationError
+import model.{Distance, Point, Report, Speed}
 
 @Singleton
-class WaydataService @Inject() (actorSystem: ActorSystem,
-                                val pointRepository: WayPointRepository)
+class WaydataService @Inject()(actorSystem: ActorSystem,
+                               val pointRepository: WayPointRepository,
+                               val userWayPointsRepository: UserWayPointsRepository)
     extends WaydataMapping {
 
   implicit val timeout = Timeout(5 seconds)
   implicit val executionContext = actorSystem.dispatcher
 
-  def save(point: Point): Future[Unit] =
+  def addPoint(point: Point): Future[Unit] = {
+    userWayPointsRepository.insertPoint(
+      point.timestamp, point.location.lat, point.location.lon
+    )
     pointRepository.save(mapPointToWayPoint(point))
+  }
 
   def report(from: Long, to: Long): Future[Report] = {
     val futureReport: Future[Future[Report]] =
@@ -57,6 +64,7 @@ class WaydataService @Inject() (actorSystem: ActorSystem,
   def getAll: Future[Seq[Point]] =
     pointRepository.findAll().map(mapSeqOfRowsToSeqOfPoint)
 
-  def getExample: Future[Option[Point]] =
+  // TODO - just for education
+  def getLastAddedToWay: Future[Option[Point]] =
     pointRepository.findByTimestamp(1000).map(mapWayPointToPointOption)
 }

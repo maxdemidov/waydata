@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, PoisonPill, Props}
 import akka.pattern.ask
 import play.api.Logger
 import services.actors.common.ImplicitActor
-import services.model.{Point, Segment}
+import model.{Point, Segment}
 
 object SegmentationActor {
   case class SegmentationPoints(points: Seq[Point])

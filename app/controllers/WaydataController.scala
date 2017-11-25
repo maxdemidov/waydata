@@ -4,25 +4,50 @@ import javax.inject.Inject
 
 import play.api.mvc._
 import play.api.libs.json._
-import akka.actor.ActorSystem
-import scala.concurrent.ExecutionContext
 
+import scala.concurrent.{ExecutionContext, Future}
 import services._
-import services.model._
+import model._
 
-class WaydataController @Inject() (actorSystem: ActorSystem)
-                                  (waydataService: WaydataService)
-                                  (implicit exec: ExecutionContext)
-  extends Controller with WaydataSerializations {
+class WaydataController @Inject()(waydataService: WaydataService)
+                                 (implicit exec: ExecutionContext)
+    extends Controller with WaydataSerializations {
 
-  def validateJson[A : Reads] = parse.json.validate(
+  private def validateJson[A: Reads]: BodyParser[A] = parse.json.validate(
     _.validate[A].asEither.left.map(e => BadRequest(JsError.toJson(e)))
   )
 
+//  def addPoint(): Action[Point] = Action.async(parse.json) { request =>
+//    request.body.validate[Point].map {
+//      point =>
+//        waydataService.addPoint(point).map {
+//          response =>
+//            if (response.status == 200) {
+//              response.json.validate[Bar].map {
+//                point =>
+//                  Ok(
+//                    Json.obj(
+//                      "status" -> "OK",
+//                      "message" -> ("Point with timestamp '" + point.timestamp + "' saved.")
+//                    )
+//                  )
+//              }.recoverTotal { e : JsError =>
+//                BadRequest("The JSON in the body is not valid.")
+//              }
+//            } else {
+//              BadRequest("alo")
+//            }
+//        }.recoverTotal {
+//          exception : JsError =>
+//            Future.successful(BadRequest("The JSON in the body is not valid."))
+//        }
+//    }
+//  }
+
   // TODO - fix using exception from future if not success
-  def point = Action(validateJson[Point]) { request =>
+  def addPoint(): Action[Point] = Action(validateJson[Point]) { request =>
     val point = request.body
-    waydataService.save(point)
+    waydataService.addPoint(point)
     Ok(
       Json.obj(
         "status" -> "OK",
@@ -31,19 +56,27 @@ class WaydataController @Inject() (actorSystem: ActorSystem)
     )
   }
 
-  def report(from: Long, to: Long) = Action.async {
-    waydataService.report(from, to).map(
-      report => Ok(Json.toJson(report))
-    )
+  def getUserWayPointExample: Action[AnyContent] = Action.async {
+    Future {
+      Ok(Json.toJson(
+        UserWayPoint(
+          new java.util.UUID(123, 45),
+          new java.util.UUID(678, 90),
+          Point(
+            new java.util.Date().getTime,
+            Speed(0),
+            Location(
+              45.11.toFloat,
+              45.99.toFloat
+            )
+          )
+        )
+      ))
+    }
   }
 
-  def example = Action.async {
-    waydataService.getExample.map(
-      examplePoint => Ok(Json.toJson(examplePoint))
-    )
-  }
-
-  def all = Action.async {
+  @deprecated // TODO - remove
+  def allPoints: Action[AnyContent] = Action.async {
     waydataService.getAll.map(
       points => Ok(Json.toJson(points))
     )

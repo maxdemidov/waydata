@@ -1,15 +1,17 @@
-package repositories
+package repositories.postgres
 
 import javax.inject.{Inject, Singleton}
 
-import slick.driver.PostgresDriver.api._
-import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
+import repositories.postgres.persistence.WaydataPoint
+import slick.jdbc.PostgresProfile.api._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
-                                   implicit val ec : ExecutionContext)
-  extends WayPointResult
+                                   implicit val ec: ExecutionContext)
+    extends WayPointResult
 //    with WayPointsTable
   {
 
@@ -20,7 +22,7 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
 //    databaseProvider.db.run(query.result.headOption)
 //  }
 
-  def save(wayPoint: WayPoint): Future[Unit] = {
+  def save(wayPoint: WaydataPoint): Future[Unit] = {
     databaseProvider.db.run(
       sqlu"""
           INSERT INTO public.way_point (created_on, speed, latitude, longitude)
@@ -38,7 +40,7 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
     }
   }
 
-  def findByInterval(fromDate: Long, toDate: Long): Future[Seq[(Long, Double, Double, Double)]] = {
+  def findByInterval(fromDate: Long, toDate: Long): Future[Seq[(Long, Double, Float, Float)]] = {
     val selectQuery =
       sql"""
           SELECT
@@ -50,11 +52,11 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
           WHERE created_on
             BETWEEN to_timestamp($fromDate::double precision / 1000)
                 AND to_timestamp($toDate::double precision / 1000)
-        """.as[(Long, Double, Double, Double)]
+        """.as[(Long, Double, Float, Float)]
     databaseProvider.db.run(selectQuery)
   }
 
-  def findAll(): Future[Seq[(Long, Double, Double, Double)]] = {
+  def findAll(): Future[Seq[(Long, Double, Float, Float)]] = {
     val selectQuery =
       sql"""
           SELECT
@@ -63,11 +65,11 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
             latitude,
             longitude
           FROM public.way_point
-        """.as[(Long, Double, Double, Double)]
+        """.as[(Long, Double, Float, Float)]
     databaseProvider.db.run(selectQuery)
   }
 
-  def findByTimestamp(timestamp: Long): Future[Option[WayPoint]] = {
+  def findByTimestamp(timestamp: Long): Future[Option[WaydataPoint]] = {
     val selectQuery =
       sql"""
           SELECT
@@ -77,7 +79,7 @@ class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
             longitude
           FROM public.way_point
           WHERE created_on = to_timestamp($timestamp::double precision / 1000)
-      """.as[WayPoint]
+      """.as[WaydataPoint]
     for {
       item <- databaseProvider.db.run(selectQuery.headOption)
     } yield item
