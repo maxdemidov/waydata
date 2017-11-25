@@ -17,9 +17,9 @@ import services.actors.CalculationActor.CalculationError
 import model.{Distance, Point, Report, Speed}
 
 @Singleton
-class WaydataService @Inject()(actorSystem: ActorSystem,
-                               val pointRepository: WayPointRepository,
-                               val userWayPointsRepository: UserWayPointsRepository)
+class WaydataPointService @Inject()(actorSystem: ActorSystem,
+                                    val pointRepository: WayPointRepository,
+                                    val userWayPointsRepository: UserWayPointsRepository)
     extends WaydataMapping {
 
   implicit val timeout = Timeout(5 seconds)

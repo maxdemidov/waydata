@@ -9,8 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import services._
 import model._
 
-class WaydataController @Inject()(waydataService: WaydataService)
-                                 (implicit exec: ExecutionContext)
+class WaydataPointController @Inject()(waydataPointService: WaydataPointService)
+                                      (implicit exec: ExecutionContext)
     extends Controller with WaydataSerializations {
 
   private def validateJson[A: Reads]: BodyParser[A] = parse.json.validate(
@@ -47,7 +47,7 @@ class WaydataController @Inject()(waydataService: WaydataService)
   // TODO - fix using exception from future if not success
   def addPoint(): Action[Point] = Action(validateJson[Point]) { request =>
     val point = request.body
-    waydataService.addPoint(point)
+    waydataPointService.addPoint(point)
     Ok(
       Json.obj(
         "status" -> "OK",
@@ -77,7 +77,7 @@ class WaydataController @Inject()(waydataService: WaydataService)
 
   @deprecated // TODO - remove
   def allPoints: Action[AnyContent] = Action.async {
-    waydataService.getAll.map(
+    waydataPointService.getAll.map(
       points => Ok(Json.toJson(points))
     )
   }

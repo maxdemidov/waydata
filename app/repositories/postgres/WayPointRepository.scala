@@ -9,6 +9,7 @@ import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
+@deprecated
 class WayPointRepository @Inject()(databaseProvider: DatabaseProvider,
                                    implicit val ec: ExecutionContext)
     extends WayPointResult

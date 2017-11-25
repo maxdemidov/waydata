@@ -3,6 +3,7 @@ package services
 import repositories.postgres.persistence.WaydataPoint
 import model.{Location, Point, Speed}
 
+@deprecated
 trait WaydataMapping {
 
   def mapSeqOfRowsToSeqOfPoint(seq: Seq[(Long, Double, Float, Float)]): Seq[Point] = {

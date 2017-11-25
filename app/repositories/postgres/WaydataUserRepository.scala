@@ -26,6 +26,7 @@ class WaydataUserRepository @Inject()(databaseProvider: DatabaseProvider,
     )
   }
 
+  // TODO
   def addUser(user: WaydataUser): Future[Unit] = {
     databaseProvider.db.run(
       sqlu"""

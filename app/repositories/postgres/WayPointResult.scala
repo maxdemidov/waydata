@@ -3,6 +3,7 @@ package repositories.postgres
 import repositories.postgres.persistence.WaydataPoint
 import slick.jdbc.GetResult
 
+@deprecated
 trait WayPointResult {
 
   implicit val getPointResult: AnyRef with GetResult[WaydataPoint] =

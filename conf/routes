@@ -41,14 +41,14 @@ GET     /waydata/way/example/       controllers.WaydataWayController.getWayExamp
 
 
 
-GET     /waydata/point              controllers.WaydataController.allPoints()
+GET     /waydata/point              controllers.WaydataPointController.allPoints()
 
 # ge total count of points at all
 
-POST    /waydata/point              controllers.WaydataController.addPoint()
+POST    /waydata/point              controllers.WaydataPointController.addPoint()
 # TODO - make UserWayPoint
 
-GET     /waydata/point/example/     controllers.WaydataController.getUserWayPointExample()
+GET     /waydata/point/example/     controllers.WaydataPointController.getUserWayPointExample()
 
 
 

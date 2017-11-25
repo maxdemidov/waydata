@@ -5,12 +5,12 @@ import javax.inject.Inject
 import model.{Way, WaydataSerializations}
 import play.api.libs.json.{JsError, Json, Reads}
 import play.api.mvc.{Action, AnyContent, BodyParser, Controller}
-import services.{WaydataService, WaydataWayService}
+import services.{WaydataPointService, WaydataWayService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class WaydataWayController @Inject()(waydataWayService: WaydataWayService)
-                                    (waydataService: WaydataService)
+                                    (waydataPointService: WaydataPointService)
                                     (implicit exec: ExecutionContext)
   extends Controller with WaydataSerializations  {
 
@@ -46,7 +46,7 @@ class WaydataWayController @Inject()(waydataWayService: WaydataWayService)
 
   def getAllPointsByWayUuid(wayUuid: java.util.UUID): Action[AnyContent] = Action.async {
     // TODO - continue from here !!
-    waydataService.getAll.map(
+    waydataPointService.getAll.map(
       points => Ok(Json.toJson(points))
     )
   }

@@ -5,16 +5,16 @@ import javax.inject.Inject
 import model.WaydataSerializations
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
-import services.WaydataService
+import services.WaydataPointService
 
 import scala.concurrent.ExecutionContext
 
-class WaydataReportController @Inject()(waydataService: WaydataService)
+class WaydataReportController @Inject()(waydataPointService: WaydataPointService)
                                        (implicit exec: ExecutionContext)
   extends Controller with WaydataSerializations {
 
   def report(from: Long, to: Long): Action[AnyContent] = Action.async {
-    waydataService.report(from, to).map(
+    waydataPointService.report(from, to).map(
       report => Ok(Json.toJson(report))
     )
   }
