@@ -21,7 +21,8 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-email" % "1.4",
   "com.github.tminglei" %% "slick-pg" % "0.15.0-RC",
   "org.scalaz" %% "scalaz-core" % "7.2.10",
-  "com.typesafe.akka" % "akka-persistence-cassandra_2.11" % "0.58"
+  "com.typesafe.akka" % "akka-persistence-cassandra_2.11" % "0.58",
+  "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 )
 
 fork in run := false

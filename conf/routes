@@ -1,6 +1,8 @@
 ## Routes
 
 
+## User
+
 GET     /waydata/user               controllers.WaydataUserController.getAllUsers()
 
 # get all users with count of ways for each and count of total points per user and total count of users
@@ -20,6 +22,7 @@ DELETE  /waydata/user/:uuid         controllers.WaydataUserController.removeUser
 GET     /waydata/user/example/      controllers.WaydataUserController.getUserExample()
 
 
+## Way
 
 GET     /waydata/way                controllers.WaydataWayController.getAllWays()
 
@@ -40,6 +43,7 @@ DELETE  /waydata/way/:uuid          controllers.WaydataWayController.removeWay(u
 GET     /waydata/way/example/       controllers.WaydataWayController.getWayExample()
 
 
+## Point
 
 GET     /waydata/point              controllers.WaydataPointController.allPoints()
 
@@ -51,6 +55,7 @@ POST    /waydata/point              controllers.WaydataPointController.addPoint(
 GET     /waydata/point/example/     controllers.WaydataPointController.getUserWayPointExample()
 
 
+## Report
 
 GET     /waydata/report/:from/:to   controllers.WaydataReportController.report(from: Long, to: Long)
 
